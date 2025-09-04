@@ -1,0 +1,50 @@
+package com.example.ratingreviewservice.service;
+
+import com.example.ratingreviewservice.model.Review;
+import com.example.ratingreviewservice.repository.ReviewRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class ReviewService {
+
+    private final ReviewRepository repo;
+
+    public ReviewService(ReviewRepository repo) {
+        this.repo = repo;
+    }
+
+    public Review addReview(Review review) {
+        review.setCreatedAt(LocalDateTime.now());
+        review.setUpdatedAt(LocalDateTime.now());
+        return repo.save(review);
+    }
+
+    public List<Review> getReviewsByProduct(Long productId) {
+        return repo.findByProductId(productId);
+    }
+
+    public Double getAverageRating(Long productId) {
+        return repo.getAverageRating(productId);
+    }
+
+    public Review updateReview(Long id, Review updatedReview) {
+        return repo.findById(id)
+                .map(r -> {
+                    r.setRating(updatedReview.getRating());
+                    r.setComment(updatedReview.getComment());
+                    r.setUpdatedAt(LocalDateTime.now());
+                    return repo.save(r);
+                }).orElseThrow(() -> new RuntimeException("Review not found"));
+    }
+
+    public void deleteReview(Long id) {
+        repo.deleteById(id);
+    }
+
+    public List<Review> getReviewsByUser(Long userId) {
+        return repo.findByUserId(userId);
+    }
+}

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-rating-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: review-rating
+  template:
+    metadata:
+      labels:
+        app: review-rating
+    spec:
+      containers:
+        - name: review-rating
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8089
+          env:
+            {{- TOYAML .VALUES.ENV | NINDENT 12 }}
+          livenessProbe:
+            {{- TOYAML .VALUES.LIVENESSPROBE | NINDENT 12 }}
+          readinessProbe:
+            {{- TOYAML .VALUES.READINESSPROBE | NINDENT 12 }}
